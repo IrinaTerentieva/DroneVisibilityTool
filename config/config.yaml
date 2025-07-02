@@ -1,0 +1,19 @@
+### /home/irina/DroneVisibilityTool/config.yaml
+
+defaults:
+  - angle  # This loads config/angle.yaml
+  - _self_
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: false
+
+analysis:
+  verbose: true
+  export_visualization: true
+  color_by_cluster: true

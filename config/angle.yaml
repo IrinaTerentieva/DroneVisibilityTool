@@ -1,0 +1,20 @@
+#yaml# Paths configuration
+### /home/irina/DroneVisibilityTool/config/angle.yaml
+
+paths:
+  dsm_path: /media/irina/My Book/Petronas/DATA/FullData/DSM_may25.tif
+  staging_gpkg: /home/irina/Desktop/petronas_staging_day2.gpkg
+  output_gpkg: /media/irina/My Book/Petronas/DATA/tmp/petronas_staging_day2.gpkg
+
+# Analysis parameters
+params:
+  drone_height_agl: 120.0  # Drone height above ground level in meters
+  elevation_angle: 5.0     # Elevation angle in degrees (upward from horizontal)
+  max_distance: 3000       # Maximum ray casting distance in meters
+  num_rays: 360           # Number of rays to cast (360 = 1 degree increments)
+  
+# Advanced parameters
+advanced:
+  min_obstruction_depth: 3  # Minimum pixels for valid obstruction
+  nodata_fill: true        # Whether to fill nodata values
+  observer_height: 1.7     # Observer eye height in meters
