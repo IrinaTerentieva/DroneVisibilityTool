@@ -149,39 +149,40 @@ def create_summary_plot(summary: Dict, save_path: Optional[str] = None):
 
     cluster_stats = summary['cluster_statistics']
 
-    # Create subplots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
-
-    # Plot 1: Area by cluster
-    clusters = list(cluster_stats.keys())
+    # Replace None with 'Unassigned' for cluster labels
+    clusters = [str(c) if c is not None else 'Unassigned' for c in cluster_stats.keys()]
     total_areas = [stats['total_area'] for stats in cluster_stats.values()]
     avg_areas = [stats['average_area'] for stats in cluster_stats.values()]
+    counts = [stats['count'] for stats in cluster_stats.values()]
 
     x = np.arange(len(clusters))
     width = 0.35
 
+    # Create subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Plot 1: Area by cluster
     ax1.bar(x - width / 2, total_areas, width, label='Total Area', alpha=0.8)
     ax1.bar(x + width / 2, avg_areas, width, label='Average Area', alpha=0.8)
-
     ax1.set_xlabel('Cluster')
     ax1.set_ylabel('Area (hectares)')
     ax1.set_title('Visibility Area by Cluster')
     ax1.set_xticks(x)
-    ax1.set_xticklabels(clusters)
+    ax1.set_xticklabels(clusters, rotation=45, ha='right')
     ax1.legend()
     ax1.grid(True, alpha=0.3)
 
     # Plot 2: Point count by cluster
-    counts = [stats['count'] for stats in cluster_stats.values()]
-
-    ax2.bar(clusters, counts, alpha=0.8, color='green')
+    ax2.bar(x, counts, alpha=0.8, color='green')
     ax2.set_xlabel('Cluster')
     ax2.set_ylabel('Number of Staging Points')
     ax2.set_title('Staging Points per Cluster')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(clusters, rotation=45, ha='right')
     ax2.grid(True, alpha=0.3)
 
     # Add value labels on bars
-    for i, (cluster, count) in enumerate(zip(clusters, counts)):
+    for i, count in enumerate(counts):
         ax2.text(i, count + 0.1, str(count), ha='center', va='bottom')
 
     plt.tight_layout()
