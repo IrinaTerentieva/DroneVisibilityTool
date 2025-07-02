@@ -125,8 +125,7 @@ def main(cfg: DictConfig) -> None:
             plot_visibility_results(
                 results,
                 color_by_cluster=cfg.analysis.color_by_cluster,
-                save_path=str(vis_path),
-                title_suffix=f"Drone at {params.drone_distance}m, {params.drone_height_agl}m AGL"
+                save_path=str(vis_path)
             )
 
         logger.info("\n✅ Analysis complete!")

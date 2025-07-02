@@ -115,10 +115,10 @@ def plot_visibility_results(results: List[Dict],
     ax.set_xlabel('Easting (m)')
     ax.set_ylabel('Northing (m)')
 
-    title = f'Drone Visibility Analysis - {filtered_results[0]["elevation_angle"]}° Elevation'
-    if color_by_cluster and unique_clusters:
-        title += ' (Colored by Cluster)'
-    ax.set_title(title)
+    # title = f'Drone Visibility Analysis - {filtered_results[0]["elevation_angle"]}° Elevation'
+    # if color_by_cluster and unique_clusters:
+    #     title += ' (Colored by Cluster)'
+    # ax.set_title(title)
 
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     ax.grid(True, alpha=0.3)
