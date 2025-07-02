@@ -14,7 +14,8 @@ params:
   num_rays: 360           # Number of rays to cast (360 = 1 degree increments)
   drone_distance_m: 1500  # Distance from observer to drone
   bearing_deg: 0.0         # Optional: angle from observer (0° = North)
-
+  drone_distance: 2000.0    # Distance to place drone from observer (meters)
+  observer_height: 1.7     # Observer eye height above ground (meters)
 
 # Advanced parameters
 advanced:
