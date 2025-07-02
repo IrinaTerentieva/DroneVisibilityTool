@@ -68,6 +68,33 @@ cluster: Cluster assignment
 visibility_area_ha: Area in hectares
 elevation_angle: Angle used for analysis
 
+### 📏 What’s Different: Fixed-Angle vs. Drone-Target Visibility
+
+| Feature                    | **Fixed-Angle Analyzer**                                     | **Drone-Target Analyzer**                                                   |
+|---------------------------|---------------------------------------------------------------|------------------------------------------------------------------------------|
+| **Elevation Angle**       | Fixed (e.g., 5° from staging point)                           | Computed dynamically using observer → drone geometry                        |
+| **Drone Position**        | Not modeled                                                   | Y meters above terrain (at each location)                                   |
+| **Drone Elevation Source**| Not applicable                                                | Min elevation in a 5 m radius buffer under each candidate drone location    |
+| **Visibility Criterion**  | Beam intersects terrain at fixed angle                        | Line-of-sight to drone is blocked by terrain along the path                |
+| **Use Case**              | Regulatory angle checks, worst-case envelope                 | Realistic flight line-of-sight modeling for actual drone routes             |
+| **Terrain Sampling**      | Single pixel per ray step                                     | Uses a local terrain minimum in 5 m radius under drone position             |
+| **Beam Type**             | Fixed-angle beam casting                                      | Dynamic beam toward target location                                         |
+| **Output**                | Polygon of visible areas from fixed angle                     | Polygon of areas where drone is visible from ground observer                |
+
+## Drone visibility above terrain:
+We're designing a second analyzer where visibility is not based on a fixed elevation angle, but instead on a dynamic angle to the drone at each point along a ray.
+
+Here’s a summary of what you need to implement:
+✅ Goal
+
+Simulate line-of-sight from the controller to the drone, where:
+
+    The controller is at a known location on the ground (staging point + observer height).
+
+    The drone is located Y meters above the terrain, and the terrain height is dynamically calculated as the minimum elevation within a 5 m buffer at the (x, y) location along the ray.
+
+    The beam angle is not fixed, but computed dynamically as the angle to the drone at each step along the ray.
+
 ## Usage Instructions:
 
 1. Clone and setup:
