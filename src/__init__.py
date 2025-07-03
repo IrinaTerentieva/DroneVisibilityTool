@@ -1,4 +1,4 @@
-from .analyzer import SpatialDroneVisibilityAnalyzer
+from .obstacle_angle_analyzer import SpatialDroneVisibilityAnalyzer
 from .utils import load_staging_points_from_gpkg
 from .visualization import plot_visibility_results
 
