@@ -5,7 +5,7 @@ A comprehensive Python toolkit for analyzing drone visibility from ground observ
 
 Modern drone operations require a nuanced understanding of what the pilot can actually see from the ground. Terrain slope, tree cover, and flight height all affect line-of-sight visibility, which can have critical implications for safety, RC strength, and operational compliance.
 
-Drone Visibility Analysis Tools is a Python-based toolkit designed to simulate and evaluate what’s visible from the pilot’s perspective. Use it for planning, compliance, or simply to gain spatial insight into how your environment affects visual connections to the sky.
+Drone Visibility Analysis Tools is designed to simulate and evaluate what’s visible from the pilot’s perspective. Use it for planning, compliance, or simply to gain spatial insight into how your environment affects visual connections to the sky.
 
 ## Features
 
