@@ -29,15 +29,15 @@ Drone Visibility Analysis Tools is designed to simulate and evaluate what’s vi
 
 ## Key Differences Between Analysis Modes
 
-| Feature                    | **Fixed-Angle Analyzer**                | **Drone-Target Analyzer**                                               |
-|---------------------------|-----------------------------------------|-------------------------------------------------------------------------|
-| **Elevation Angle**       | Fixed (e.g., 5° from staging point)     | Computed dynamically using observer → drone geometry                    |
-| **Drone Position**        | Not modeled                             | Y meters above terrain (at each location)                               |
-| **Drone Elevation Source**| Not applicable                          | Min elevation in a 5m radius buffer under each candidate drone location |
-| **Visibility Criterion**  | Beam intersects terrain at fixed angle  | Line-of-sight to drone is blocked by terrain along the path             |
-| **Use Case**              | Regulatory angle checks                 | Realistic flight line-of-sight modeling for actual drone routes         |
+| Feature                    | **Fixed-Angle Analyzer**               | **Drone-Target Analyzer**                                               |
+|---------------------------|----------------------------------------|-------------------------------------------------------------------------|
+| **Elevation Angle**       | Fixed (e.g., 5° from staging point)    | Computed dynamically using observer → drone geometry                    |
+| **Drone Position**        | Not modeled                            | Y meters above terrain (at each location)                               |
+| **Drone Elevation Source**| Not applicable                         | Min elevation in a 5m radius buffer under each candidate drone location |
+| **Visibility Criterion**  | Beam intersects terrain at fixed angle | Line-of-sight to drone is blocked by terrain along the path             |
+| **Use Case**              | Regulatory angle checks                | Realistic flight line-of-sight modeling for actual drone routes         |
 | **Output**                | Polygon of visible sky from fixed angle | Polygon of areas where drone is visible from ground observer            |
-| **Adaptive Mode**         | NA                                      | Move drone closer until visible                                         |
+| **Adaptive Mode**         | Not applicable                         | Move drone closer until visible                                         |
 
 ## 🔍 Understanding the Difference: Sky Visibility vs. Drone Visibility
 
