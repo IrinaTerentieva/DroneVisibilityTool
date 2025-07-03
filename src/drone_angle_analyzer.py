@@ -103,8 +103,8 @@ class DroneAngleVisibilityAnalyzer:
         return self._get_elevation_safe(center_row, center_col)
 
     def _calculate_angle_to_drone(self, observer_x: float, observer_y: float,
-                                  observer_elev: float, drone_x: float, drone_y: float,
-                                  drone_height_agl: float, observer_height: float = 1.7) -> Dict:
+                                 observer_elev: float, drone_x: float, drone_y: float,
+                                 drone_height_agl: float, observer_height: float = 1.7) -> Dict:
         """
         Calculate the angle from observer to drone.
 
@@ -128,7 +128,7 @@ class DroneAngleVisibilityAnalyzer:
         observer_eye_level = observer_elev + observer_height
 
         # Calculate horizontal distance
-        horizontal_distance = np.sqrt((drone_x - observer_x) ** 2 + (drone_y - observer_y) ** 2)
+        horizontal_distance = np.sqrt((drone_x - observer_x)**2 + (drone_y - observer_y)**2)
 
         # Calculate vertical distance
         vertical_distance = drone_absolute_elev - observer_eye_level
@@ -147,7 +147,7 @@ class DroneAngleVisibilityAnalyzer:
         }
 
     def _check_obstruction_depth(self, hit_row: int, hit_col: int,
-                                 beam_elevation: float, min_depth_pixels: int = 3) -> bool:
+                                beam_elevation: float, min_depth_pixels: int = 3) -> bool:
         """
         Check if obstruction has sufficient depth to be considered valid.
         """
@@ -170,9 +170,9 @@ class DroneAngleVisibilityAnalyzer:
         return obstruction_count >= min_depth_pixels
 
     def _cast_ray_to_drone(self, start_x: float, start_y: float, start_elevation: float,
-                           target_x: float, target_y: float, target_elevation: float,
-                           observer_height: float = 1.7,
-                           min_depth_pixels: int = 3) -> Dict:
+                          target_x: float, target_y: float, target_elevation: float,
+                          observer_height: float = 1.7,
+                          min_depth_pixels: int = 3) -> Dict:
         """
         Cast a ray from observer to target drone position and check for obstructions.
 
@@ -185,7 +185,7 @@ class DroneAngleVisibilityAnalyzer:
         # Calculate ray direction
         dx = target_x - start_x
         dy = target_y - start_y
-        horizontal_distance = np.sqrt(dx ** 2 + dy ** 2)
+        horizontal_distance = np.sqrt(dx**2 + dy**2)
 
         if horizontal_distance == 0:
             return {'clear': True, 'obstruction_distance': 0}
@@ -227,47 +227,42 @@ class DroneAngleVisibilityAnalyzer:
 
         return {'clear': True, 'obstruction_distance': horizontal_distance}
 
-    def _create_drone_visibility_polygon(self, staging_x: float, staging_y: float,
-                                         staging_elevation: float,
-                                         drone_distance: float,
-                                         drone_height_agl: float,
-                                         num_rays: int = 360,
-                                         observer_height: float = 1.7,
-                                         **kwargs) -> Tuple[Polygon, Dict]:
+    def _find_visible_drone_distance(self, staging_x: float, staging_y: float,
+                                   staging_elevation: float, bearing_rad: float,
+                                   max_distance: float, drone_height_agl: float,
+                                   observer_height: float = 1.7,
+                                   step_back: float = 200.0,
+                                   min_distance: float = 100.0,
+                                   **kwargs) -> Dict:
         """
-        Create visibility polygon for drone at specified distance and height.
+        Find the maximum distance where drone is visible along a bearing.
+        If drone is not visible at max_distance, step back until visible.
 
         Args:
             staging_x, staging_y: Observer coordinates
-            staging_elevation: Ground elevation at observer
-            drone_distance: Distance to place drone
+            staging_elevation: Observer ground elevation
+            bearing_rad: Bearing in radians
+            max_distance: Maximum distance to try
             drone_height_agl: Drone height above ground
-            num_rays: Number of rays to cast
             observer_height: Observer eye height
+            step_back: Distance to step back when drone not visible
+            min_distance: Minimum distance to consider
 
         Returns:
-            Tuple of (visibility polygon, analysis metadata)
+            Dictionary with visibility information
         """
-        visibility_points = []
-        ray_results = []
-        angles_used = []
+        current_distance = max_distance
 
-        for ray_idx in range(num_rays):
-            # Calculate bearing
-            bearing_deg = ray_idx * (360.0 / num_rays)
-            bearing_rad = np.radians(bearing_deg)
-
-            # Calculate drone position at specified distance
-            drone_x = staging_x + drone_distance * np.sin(bearing_rad)
-            drone_y = staging_y + drone_distance * np.cos(bearing_rad)
+        while current_distance >= min_distance:
+            # Calculate drone position at current distance
+            drone_x = staging_x + current_distance * np.sin(bearing_rad)
+            drone_y = staging_y + current_distance * np.cos(bearing_rad)
 
             # Get drone terrain elevation and calculate angle
             angle_info = self._calculate_angle_to_drone(
                 staging_x, staging_y, staging_elevation,
                 drone_x, drone_y, drone_height_agl, observer_height
             )
-
-            angles_used.append(angle_info['angle_degrees'])
 
             # Cast ray to drone
             ray_result = self._cast_ray_to_drone(
@@ -276,24 +271,151 @@ class DroneAngleVisibilityAnalyzer:
                 observer_height, **kwargs
             )
 
-            ray_results.append({
-                'bearing': bearing_deg,
-                'angle_to_drone': angle_info['angle_degrees'],
-                'clear_to_drone': ray_result['clear'],
-                'obstruction_distance': ray_result['obstruction_distance']
-            })
-
-            # Add visibility point
             if ray_result['clear']:
-                # Can see all the way to drone distance
-                visibility_points.append((drone_x, drone_y))
-            else:
-                # Blocked before reaching drone
-                if 'obstruction_coords' in ray_result:
-                    visibility_points.append(ray_result['obstruction_coords'])
+                # Drone is visible at this distance
+                return {
+                    'visible': True,
+                    'distance': current_distance,
+                    'drone_coords': (drone_x, drone_y),
+                    'angle': angle_info['angle_degrees'],
+                    'drone_elevation': angle_info['drone_absolute_elev'],
+                    'attempts': int((max_distance - current_distance) / step_back) + 1
+                }
+
+            # Drone not visible, try closer
+            current_distance -= step_back
+
+        # Drone not visible even at minimum distance
+        return {
+            'visible': False,
+            'distance': 0,
+            'drone_coords': (staging_x, staging_y),
+            'angle': 0,
+            'drone_elevation': staging_elevation,
+            'attempts': int((max_distance - min_distance) / step_back) + 1
+        }
+
+    def _create_drone_visibility_polygon(self, staging_x: float, staging_y: float,
+                                       staging_elevation: float,
+                                       drone_distance: float,
+                                       drone_height_agl: float,
+                                       num_rays: int = 360,
+                                       observer_height: float = 1.7,
+                                       adaptive_positioning: bool = True,
+                                       step_back: float = 200.0,
+                                       min_distance: float = 100.0,
+                                       **kwargs) -> Tuple[Polygon, Dict]:
+        """
+        Create visibility polygon for drone with adaptive positioning.
+
+        Args:
+            staging_x, staging_y: Observer coordinates
+            staging_elevation: Ground elevation at observer
+            drone_distance: Target distance to place drone
+            drone_height_agl: Drone height above ground
+            num_rays: Number of rays to cast
+            observer_height: Observer eye height
+            adaptive_positioning: If True, move drone closer if not visible
+            step_back: Distance to step back when drone not visible
+            min_distance: Minimum distance to consider
+
+        Returns:
+            Tuple of (visibility polygon, analysis metadata)
+        """
+        visibility_points = []
+        ray_results = []
+        angles_used = []
+        distances_used = []
+        adaptation_stats = {
+            'total_adaptations': 0,
+            'min_adapted_distance': drone_distance,
+            'max_adapted_distance': 0,
+            'rays_adapted': 0
+        }
+
+        for ray_idx in range(num_rays):
+            # Calculate bearing
+            bearing_deg = ray_idx * (360.0 / num_rays)
+            bearing_rad = np.radians(bearing_deg)
+
+            if adaptive_positioning:
+                # Find visible drone distance
+                visibility_info = self._find_visible_drone_distance(
+                    staging_x, staging_y, staging_elevation,
+                    bearing_rad, drone_distance, drone_height_agl,
+                    observer_height, step_back, min_distance, **kwargs
+                )
+
+                if visibility_info['visible']:
+                    # Use the found distance
+                    actual_distance = visibility_info['distance']
+                    drone_x, drone_y = visibility_info['drone_coords']
+                    angle = visibility_info['angle']
+
+                    # Update adaptation statistics
+                    if actual_distance < drone_distance:
+                        adaptation_stats['rays_adapted'] += 1
+                        adaptation_stats['total_adaptations'] += visibility_info['attempts'] - 1
+                        adaptation_stats['min_adapted_distance'] = min(
+                            adaptation_stats['min_adapted_distance'], actual_distance
+                        )
+                    adaptation_stats['max_adapted_distance'] = max(
+                        adaptation_stats['max_adapted_distance'], actual_distance
+                    )
+
+                    visibility_points.append((drone_x, drone_y))
                 else:
-                    # Shouldn't happen, but fallback
+                    # Not visible even at minimum distance
+                    actual_distance = 0
+                    angle = 0
                     visibility_points.append((staging_x, staging_y))
+
+                angles_used.append(angle)
+                distances_used.append(actual_distance)
+
+                ray_results.append({
+                    'bearing': bearing_deg,
+                    'angle_to_drone': angle,
+                    'clear_to_drone': visibility_info['visible'],
+                    'actual_distance': actual_distance,
+                    'target_distance': drone_distance,
+                    'adapted': actual_distance < drone_distance
+                })
+            else:
+                # Original non-adaptive behavior
+                drone_x = staging_x + drone_distance * np.sin(bearing_rad)
+                drone_y = staging_y + drone_distance * np.cos(bearing_rad)
+
+                # Get drone terrain elevation and calculate angle
+                angle_info = self._calculate_angle_to_drone(
+                    staging_x, staging_y, staging_elevation,
+                    drone_x, drone_y, drone_height_agl, observer_height
+                )
+
+                angles_used.append(angle_info['angle_degrees'])
+
+                # Cast ray to drone
+                ray_result = self._cast_ray_to_drone(
+                    staging_x, staging_y, staging_elevation,
+                    drone_x, drone_y, angle_info['drone_absolute_elev'],
+                    observer_height, **kwargs
+                )
+
+                ray_results.append({
+                    'bearing': bearing_deg,
+                    'angle_to_drone': angle_info['angle_degrees'],
+                    'clear_to_drone': ray_result['clear'],
+                    'obstruction_distance': ray_result['obstruction_distance']
+                })
+
+                # Add visibility point
+                if ray_result['clear']:
+                    visibility_points.append((drone_x, drone_y))
+                else:
+                    if 'obstruction_coords' in ray_result:
+                        visibility_points.append(ray_result['obstruction_coords'])
+                    else:
+                        visibility_points.append((staging_x, staging_y))
 
         # Close polygon
         if visibility_points and visibility_points[0] != visibility_points[-1]:
@@ -306,33 +428,68 @@ class DroneAngleVisibilityAnalyzer:
             polygon = Point(staging_x, staging_y).buffer(50)
 
         # Calculate statistics
+        if angles_used:
+            angles_array = np.array([a for a in angles_used if a != 0])  # Exclude failed attempts
+            if len(angles_array) > 0:
+                angle_stats = {
+                    'min_angle': np.min(angles_array),
+                    'max_angle': np.max(angles_array),
+                    'mean_angle': np.mean(angles_array),
+                    'std_angle': np.std(angles_array)
+                }
+            else:
+                angle_stats = {
+                    'min_angle': 0,
+                    'max_angle': 0,
+                    'mean_angle': 0,
+                    'std_angle': 0
+                }
+        else:
+            angle_stats = {
+                'min_angle': 0,
+                'max_angle': 0,
+                'mean_angle': 0,
+                'std_angle': 0
+            }
+
         metadata = {
-            'min_angle': np.min(angles_used),
-            'max_angle': np.max(angles_used),
-            'mean_angle': np.mean(angles_used),
-            'std_angle': np.std(angles_used),
+            **angle_stats,
             'percent_visible': sum(1 for r in ray_results if r['clear_to_drone']) / len(ray_results) * 100,
-            'ray_results': ray_results
+            'ray_results': ray_results,
+            'adaptive_positioning': adaptive_positioning
         }
+
+        if adaptive_positioning:
+            metadata['adaptation_stats'] = adaptation_stats
+            metadata['avg_distance'] = np.mean(distances_used) if distances_used else 0
+            metadata['min_distance'] = np.min(distances_used) if distances_used else 0
+            metadata['max_distance'] = np.max(distances_used) if distances_used else 0
+            metadata['adaptation_percentage'] = (adaptation_stats['rays_adapted'] / num_rays) * 100
 
         return polygon, metadata
 
     def analyze_staging_area(self, staging_point: Dict, staging_id: int,
-                             drone_distance: float = 2000.0,
-                             drone_height_agl: float = 120.0,
-                             num_rays: int = 360,
-                             observer_height: float = 1.7,
-                             **kwargs) -> Dict:
+                           drone_distance: float = 2000.0,
+                           drone_height_agl: float = 120.0,
+                           num_rays: int = 360,
+                           observer_height: float = 1.7,
+                           adaptive_positioning: bool = True,
+                           step_back: float = 200.0,
+                           min_distance: float = 100.0,
+                           **kwargs) -> Dict:
         """
         Analyze visibility to drone from a single staging area.
 
         Args:
             staging_point: Dict with 'coords' and optional 'cluster'
             staging_id: Unique identifier
-            drone_distance: Distance to place drone (meters)
+            drone_distance: Target distance to place drone (meters)
             drone_height_agl: Drone height above ground level
             num_rays: Number of rays to cast
             observer_height: Observer eye height
+            adaptive_positioning: If True, move drone closer if not visible
+            step_back: Distance to step back when drone not visible
+            min_distance: Minimum distance to consider
 
         Returns:
             Dictionary with analysis results
@@ -348,18 +505,21 @@ class DroneAngleVisibilityAnalyzer:
             raise ValueError(f"Invalid staging location: ({staging_x}, {staging_y})")
 
         logger.info(f"Analyzing staging {staging_id} for drone at {drone_distance}m, {drone_height_agl}m AGL...")
+        if adaptive_positioning:
+            logger.info(f"  Adaptive positioning enabled (step back: {step_back}m, min: {min_distance}m)")
 
         # Create visibility polygon
         polygon, metadata = self._create_drone_visibility_polygon(
             staging_x, staging_y, staging_elevation,
             drone_distance, drone_height_agl, num_rays,
-            observer_height, **kwargs
+            observer_height, adaptive_positioning,
+            step_back, min_distance, **kwargs
         )
 
         # Calculate area
         area_ha = polygon.area / 10000
 
-        return {
+        result = {
             'staging_id': staging_id,
             'staging_coords': (staging_x, staging_y),
             'staging_elevation': staging_elevation,
@@ -373,11 +533,27 @@ class DroneAngleVisibilityAnalyzer:
             'max_angle_to_drone': metadata['max_angle'],
             'percent_rays_clear': metadata['percent_visible'],
             'num_rays': num_rays,
-            'metadata': metadata
+            'metadata': metadata,
+            'adaptive_positioning': adaptive_positioning
         }
 
+        # Add adaptive positioning statistics if used
+        if adaptive_positioning:
+            adapt_stats = metadata['adaptation_stats']
+            result['adaptation_percentage'] = metadata['adaptation_percentage']
+            result['avg_actual_distance'] = metadata['avg_distance']
+            result['min_actual_distance'] = metadata['min_distance']
+            result['max_actual_distance'] = metadata['max_distance']
+
+            logger.info(f"  Adaptation results: {adapt_stats['rays_adapted']}/{num_rays} rays adapted "
+                       f"({metadata['adaptation_percentage']:.1f}%)")
+            logger.info(f"  Distance range: {metadata['min_distance']:.0f}m - {metadata['max_distance']:.0f}m "
+                       f"(avg: {metadata['avg_distance']:.0f}m)")
+
+        return result
+
     def analyze_multiple_staging_areas(self, staging_points: List[Dict],
-                                       **kwargs) -> List[Dict]:
+                                     **kwargs) -> List[Dict]:
         """Analyze multiple staging areas for drone visibility."""
         results = []
 
@@ -415,7 +591,7 @@ class DroneAngleVisibilityAnalyzer:
 
         for result in results:
             staging_geoms.append(Point(result['staging_coords']))
-            staging_data.append({
+            data_dict = {
                 'staging_id': result['staging_id'],
                 'staging_x': result['staging_coords'][0],
                 'staging_y': result['staging_coords'][1],
@@ -425,7 +601,16 @@ class DroneAngleVisibilityAnalyzer:
                 'drone_height_agl': result['drone_height_agl'],
                 'mean_angle': result['mean_angle_to_drone'],
                 'percent_clear': result['percent_rays_clear']
-            })
+            }
+
+            # Add adaptive positioning stats if available
+            if result.get('adaptive_positioning', False):
+                data_dict['adapt_pct'] = result.get('adaptation_percentage', 0)
+                data_dict['avg_dist'] = result.get('avg_actual_distance', result['drone_distance'])
+                data_dict['min_dist'] = result.get('min_actual_distance', result['drone_distance'])
+                data_dict['max_dist'] = result.get('max_actual_distance', result['drone_distance'])
+
+            staging_data.append(data_dict)
 
         staging_gdf = gpd.GeoDataFrame(
             staging_data, geometry=staging_geoms, crs=self.crs
@@ -438,7 +623,7 @@ class DroneAngleVisibilityAnalyzer:
         for result in results:
             if result['visibility_polygon'] is not None:
                 visibility_geoms.append(result['visibility_polygon'])
-                visibility_data.append({
+                data_dict = {
                     'staging_id': result['staging_id'],
                     'cluster': result['cluster'],
                     'staging_x': result['staging_coords'][0],
@@ -452,8 +637,18 @@ class DroneAngleVisibilityAnalyzer:
                     'max_angle_deg': result['max_angle_to_drone'],
                     'percent_rays_clear': result['percent_rays_clear'],
                     'num_rays': result['num_rays'],
+                    'adaptive': result.get('adaptive_positioning', False),
                     'analysis_date': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
-                })
+                }
+
+                # Add adaptive positioning stats if available
+                if result.get('adaptive_positioning', False):
+                    data_dict['adaptation_pct'] = result.get('adaptation_percentage', 0)
+                    data_dict['avg_actual_dist'] = result.get('avg_actual_distance', result['drone_distance'])
+                    data_dict['min_actual_dist'] = result.get('min_actual_distance', result['drone_distance'])
+                    data_dict['max_actual_dist'] = result.get('max_actual_distance', result['drone_distance'])
+
+                visibility_data.append(data_dict)
 
         visibility_gdf = gpd.GeoDataFrame(
             visibility_data, geometry=visibility_geoms, crs=self.crs
