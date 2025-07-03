@@ -73,7 +73,7 @@ def main(cfg: DictConfig) -> None:
             sys.exit(1)
 
         # Export results
-        output_path = Path(paths.output_gpkg)
+        output_path = Path(str(paths.staging_gpkg).replace('.gpkg', '_drone_vis.gpkg'))
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"\nExporting results to: {paths.output_gpkg}")
