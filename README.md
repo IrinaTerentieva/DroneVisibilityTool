@@ -1,8 +1,13 @@
 # Drone Visibility Analysis Tools 🚁
 
 A comprehensive Python toolkit for analyzing drone visibility from ground observation points using Digital Surface Models (DSM). The toolkit includes two complementary analysis methods: fixed-angle ray casting and dynamic drone-target visibility calculation.
+## Introduction
 
-## 🌟 Features
+Modern drone operations require a nuanced understanding of what the pilot can actually see from the ground. Terrain slope, tree cover, and flight height all affect line-of-sight visibility, which can have critical implications for safety, RC strength, and operational compliance.
+
+Drone Visibility Analysis Tools is a Python-based toolkit designed to simulate and evaluate what’s visible from the pilot’s perspective. Use it for planning, compliance, or simply to gain spatial insight into how your environment affects visual connections to the sky.
+
+## Features
 
 ### Core Capabilities
 - **Ray-casting visibility analysis**: Determines line-of-sight visibility areas
@@ -22,7 +27,7 @@ A comprehensive Python toolkit for analyzing drone visibility from ground observ
 - **Adaptive positioning**: Automatically moves drone closer if not visible
 - Perfect for flight planning and operational scenarios
 
-## 📏 Key Differences Between Analysis Modes
+## Key Differences Between Analysis Modes
 
 | Feature                    | **Fixed-Angle Analyzer**                                     | **Drone-Target Analyzer**                                                   |
 |---------------------------|---------------------------------------------------------------|------------------------------------------------------------------------------|
@@ -227,7 +232,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For questions, issues, or contributions:
 - Open an issue on GitHub
-- Contact AGRG: https://www.appliedgrg.ca/contact
+- Contact AGRG: https://www.appliedgrg.ca
 - Contact Falcon & Swift: https://www.falconandswift.ca
 
 ---
