@@ -1,4 +1,4 @@
-# Drone Visibility Analysis Tools 🚁
+# Drone Visibility Analysis Tools
 
 A comprehensive Python toolkit for analyzing drone visibility from ground observation points using Digital Surface Models (DSM). The toolkit includes two complementary analysis methods: fixed-angle ray casting and dynamic drone-target visibility calculation.
 ## Introduction
