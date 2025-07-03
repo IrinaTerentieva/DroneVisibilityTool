@@ -7,11 +7,6 @@ A comprehensive Python toolkit for analyzing drone visibility from ground observ
 ### Core Capabilities
 - **Ray-casting visibility analysis**: Determines line-of-sight visibility areas
 - **Spatial polygon generation**: Creates visibility polygons showing observable areas
-- **Cluster-aware analysis**: Maintains staging point cluster information throughout analysis
-- **GeoPackage export**: Outputs results in QGIS-compatible format
-- **Configurable parameters**: Uses Hydra for flexible configuration management
-- **Depth-checking algorithm**: Validates obstructions to avoid false positives from single pixels
-- **Adaptive positioning**: Automatically adjusts drone distance for realistic visibility (drone-target mode)
 
 ### Two Analysis Modes
 
@@ -19,14 +14,12 @@ A comprehensive Python toolkit for analyzing drone visibility from ground observ
 - Casts rays at a specified elevation angle (e.g., 5°) in all directions
 - Identifies terrain obstacles blocking the line of sight
 - Creates visibility polygons showing observable areas at fixed angles
-- Useful for regulatory angle checks and worst-case envelope analysis
+- Useful for regulatory sky visibility checks
 
 #### 2. **Drone-Target Analysis** (`DroneAngleVisibilityAnalyzer`)
 - Calculates the actual angle needed to see a drone at specific positions
 - Places drones at target distances and heights above ground level
-- Uses minimum elevation in 5m buffer for realistic drone positioning
 - **Adaptive positioning**: Automatically moves drone closer if not visible
-- Creates realistic visibility polygons based on actual drone positions
 - Perfect for flight planning and operational scenarios
 
 ## 📏 Key Differences Between Analysis Modes
@@ -75,8 +68,12 @@ The analysis reveals two critical scenarios that demonstrate why both tools are 
 This comparison demonstrates that:
 - **Fixed-angle analysis** (5° sky visibility) doesn't predict actual drone visibility
 - **Drone-target analysis** accounts for terrain elevation changes and actual drone position
-- In mountainous terrain, a drone can be visible when flying uphill despite blocked sky views
+- In foothill terrain, a drone can be visible when flying uphill despite blocked sky views
 - Conversely, clear sky visibility doesn't guarantee drone visibility in valleys
+
+![Sky vs Drone Visibility Analysis](examples/drone_sky_visibility_2.png)
+
+The image demonstrates a compound visibility challenge: while slope (uphill or downhill) affects line-of-sight geometry, tall trees to the southwest of the staging area further obstruct views to both the sky and the drone.
 
 **Bottom line**: For safe drone operations, you need to analyze actual drone positions, not just sky visibility angles.
 
@@ -101,8 +98,8 @@ This comparison demonstrates that:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/drone-visibility-tools.git
-   cd drone-visibility-tools
+   git clone https://github.com/IrinaTerentieva/DroneVisibilityTool.git
+   cd DroneVisibilityTool
    ```
 
 2. Install dependencies:
@@ -119,7 +116,7 @@ This comparison demonstrates that:
 
 ### Fixed-Angle Analysis
 
-Configure your analysis parameters in `configs/angle.yaml`:
+Configure your analysis parameters in `config/angle.yaml`:
 ```yaml
 paths:
   dsm_path: /path/to/your/dsm.tif
@@ -135,12 +132,12 @@ params:
 
 Run analysis:
 ```bash
-python src/main.py
+python main_sky_angle.py
 ```
 
 ### Drone-Target Analysis
 
-Configure parameters in `configs/drone_angle.yaml`:
+Configure parameters in `config/angle.yaml`:
 ```yaml
 drone_params:
   drone_distance: 2000.0      # Target distance to place drone
@@ -161,8 +158,6 @@ python main_drone_angle.py
 1. **Loading staging points**: Reads observation points from a GeoPackage file
 2. **Ray casting**: For each point, casts rays at the specified elevation angle in all directions
 3. **Obstruction detection**: Finds where each ray intersects with terrain (considering obstruction depth)
-4. **Polygon creation**: Connects intersection points to create visibility polygons
-5. **Export**: Saves results as GeoPackage layers with cluster information preserved
 
 ### Drone-Target Analysis Algorithm
 1. **Drone placement**: Positions drone at target distance and height above ground level
@@ -172,7 +167,6 @@ python main_drone_angle.py
 5. **Adaptive positioning** (if enabled):
    - If blocked, moves drone closer by `step_back` distance
    - Repeats until visible or minimum distance reached
-6. **Polygon creation**: Creates polygon showing actual drone visibility
 
 ### Algorithm Details
 - **Observer height**: 1.7m above ground (eye level)
@@ -198,21 +192,6 @@ Both tools generate GeoPackage files with multiple layers:
 - `percent_rays_clear`: Percentage of unobstructed rays (drone-target mode)
 - `adaptation_pct`: Percentage of rays requiring closer positioning (adaptive mode)
 
-## 💡 Usage Examples
-
-### Command Line Overrides
-
-```bash
-# Fixed angle analysis with 10° angle
-python src/main.py params.elevation_angle=10.0
-
-# Drone analysis at 3km distance
-python main_drone_angle.py drone_params.drone_distance=3000
-
-# Disable adaptive positioning
-python main_drone_angle.py drone_params.adaptive_positioning=false
-```
-
 ### Batch Analysis
 
 ```bash
@@ -222,21 +201,6 @@ python src/main.py --multirun params.elevation_angle=5,10,15,20
 # Test multiple drone distances
 python main_drone_angle.py --multirun drone_params.drone_distance=1000,2000,3000,4000
 ```
-
-## 🎯 Use Cases
-
-### Fixed-Angle Analysis
-- **Regulatory compliance**: Verify minimum elevation angles for drone operations
-- **Terrain assessment**: Identify challenging topography
-- **Worst-case planning**: Conservative visibility envelopes
-- **Infrastructure planning**: Tower and antenna placement
-
-### Drone-Target Analysis
-- **Flight planning**: Determine actual visibility for specific drone routes
-- **Search and rescue**: Find optimal observation points
-- **Wildlife monitoring**: Plan observation posts with maximum coverage
-- **Emergency response**: Identify safe operating areas
-- **Delivery operations**: Verify line-of-sight for urban deliveries
 
 ## 🤝 Acknowledgments
 
@@ -258,18 +222,6 @@ Built with:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 📚 Citation
-
-If you use these tools in your research, please cite:
-```bibtex
-@software{drone_visibility_tools,
-  title = {Drone Visibility Analysis Tools},
-  author = {Applied Geospatial Research Group and Falcon & Swift Geomatics},
-  year = {2024},
-  organization = {University of Calgary},
-  url = {https://github.com/yourusername/drone-visibility-tools}
-}
-```
 
 ## 📞 Support
 
@@ -280,6 +232,6 @@ For questions, issues, or contributions:
 
 ---
 
-**Happy Flying! 🚁✨**
+**Happy Flying!
 
 *Advancing drone operations through intelligent visibility analysis*
