@@ -10,9 +10,9 @@ paths:
 params:
   drone_height_agl: 120.0  # Drone height above ground level in meters
   elevation_angle: 5.0     # Elevation angle in degrees (upward from horizontal)
-  max_distance: 3000       # Maximum ray casting distance in meters
+  max_distance: 2000       # Maximum ray casting distance in meters
   num_rays: 360           # Number of rays to cast (360 = 1 degree increments)
-  drone_distance_m: 1500  # Distance from observer to drone
+  drone_distance_m: 2000  # Distance from observer to drone
   bearing_deg: 0.0         # Optional: angle from observer (0° = North)
   drone_distance: 2000.0    # Distance to place drone from observer (meters)
   observer_height: 1.7     # Observer eye height above ground (meters)

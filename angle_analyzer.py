@@ -80,9 +80,11 @@ def main(cfg: DictConfig) -> None:
             logger.error("No analysis results generated!")
             sys.exit(1)
 
+        output_path = Path(str(paths.staging_gpkg).replace('.gpkg', '_angle_vis.gpkg'))
+
         # Export results
-        logger.info(f"\nExporting results to: {paths.output_gpkg}")
-        output_path = analyzer.export_to_gpkg(results, paths.output_gpkg)
+        logger.info(f"\nExporting results to: {output_path}")
+        output_path = analyzer.export_to_gpkg(results, output_path)
 
         # Generate summary
         logger.info("\nAnalysis Summary:")
@@ -113,10 +115,6 @@ def main(cfg: DictConfig) -> None:
                 color_by_cluster=cfg.analysis.color_by_cluster,
                 save_path=str(vis_path)
             )
-
-            # Summary plot
-            summary_path = Path(paths.output_gpkg).parent / "summary_plot.png"
-            # create_summary_plot(summary, save_path=str(summary_path))
 
         logger.info("\n✅ Analysis complete!")
         logger.info(f"Results saved to: {output_path}")
