@@ -207,19 +207,22 @@ python main_drone_angle.py --multirun drone_params.drone_distance=1000,2000,3000
 
 ## 🤝 Acknowledgments
 
-Developed by:
+**Funding**
 
-- **Applied Geospatial Research Group (AGRG), University of Calgary**
-  - https://www.appliedgrg.ca/
-  
-- **Falcon & Swift Geomatics Ltd**
-  - https://www.falconandswift.ca/
+This repository is part of the Boreal Ecosystem Recovery and Assessment (BERA) project (www.bera-project.org), and was supported by a Natural Sciences and Engineering Research Council of Canada Alliance Grant (ALLRP 548285-19) in conjunction with Alberta-Pacific Forest Industries, Alberta Biodiversity Monitoring Institute, Alberta Environment and Protected Areas, Alberta Innovates, Canadian Natural Resources Ltd., Cenovus Energy, ConocoPhillips Canada, Imperial Oil Ltd., and Natural Resources Canada.
 
-Built with:
-- [Hydra](https://hydra.cc/) for configuration management
-- [Rasterio](https://rasterio.readthedocs.io/) for efficient DSM processing
-- [GeoPandas](https://geopandas.org/) for spatial data handling
-- [Matplotlib](https://matplotlib.org/) for visualization
+**Contributions**
+
+Conceptualization: Irina Terenteva (IT)
+
+Coding: IT
+
+Data Curation: N/A
+
+Other Contributions: Nicole Byford (NB) and Xue Yan Chan (XYC) tested the tool and provided feedback.
+
+
+Irina Terenteva developed this repository while serving a joint role with the **Applied Geospatial Research Group** at the University of Calgary (https://www.appliedgrg.ca/) and **Falcon & Swift Geomatics** (https://www.falconandswift.ca/).  The support of both organizations is acknowledged.
 
 ## 📄 License
 
