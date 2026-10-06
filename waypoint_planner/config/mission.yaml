@@ -8,11 +8,11 @@ mission:
   area_index: 0              # which polygon of `areas` (in file order) to fly
   camera: tele_7x
   altitude_m: 30             # AGL, flat terrain: height relative to take-off point
-  front_overlap: 0.80        # only sets the photo interval distance (free in time)
+  front_overlap: 0.60        # sets the photo interval distance; >=70% makes the camera interval limit the speed
   side_overlap: 0.30
   name: CSC_M4E_tele7x_30m
-  export_dir: /media/irina/SD_Card/good_mission   # also copy KMZ legs + boundary + scripts snapshot here (null = skip)
-  leg_min: 45                # minutes of wayline per KMZ (one file per battery); null = one file
+  export_dir: /media/irina/SD_Card/good_mission_single   # also copy KMZ legs + boundary + scripts snapshot here (null = skip)
+  leg_min: null              # minutes of wayline per KMZ; null = ONE mission (resume after battery swap in Pilot 2)
   min_speed_ms: null         # no floor: Pilot 2 accepted 0.71 m/s in your 8 Sep mission
 
 dji:
