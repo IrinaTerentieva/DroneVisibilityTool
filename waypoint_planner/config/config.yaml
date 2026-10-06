@@ -1,0 +1,92 @@
+# Flight-time estimator for DJI Matrice 4E (M4E) camera zoom levels.
+# Run run_flight_time.py from PyCharm (no CLI args needed). Every list below is swept (full grid).
+
+hydra:
+  run:
+    dir: outputs/${now:%d%b%Y}_${now:%H-%M-%S}
+  job:
+    chdir: false
+
+# ---------------------------------------------------------------- areas
+areas:
+  - path: /media/irina/Cold/CityOfCalgary_UrbanForestry/vector/CSC Site Map.kml
+    layer: null          # null = first layer
+    name_field: null     # attribute used as polygon name (null -> file stem + index)
+
+# ---------------------------------------------------------------- sweep
+sweep:
+  camera: [tele_7x]          # keys of `cameras` below (tele_7x, medium_tele_3x, wide_1x)
+  altitude_m: [10]           # AGL, flat terrain; if set (non-empty) it overrides gsd_cm. Use null to sweep gsd_cm
+  gsd_cm: [0.2, 0.25, 0.3, 0.4]   # target ground sample distance
+  front_overlap: [0.80]      # along-track overlap, 0..1
+  side_overlap: [0.70]       # across-track overlap, 0..1
+
+# ---------------------------------------------------------------- cameras
+# Footprint depends only on the 35mm-equivalent focal length (diagonal based, 4:3 sensor):
+#   sensor_width / focal_length = 0.8 * 43.267 / equiv_focal_mm
+# Tele 168mm: 1/1.5" 48MP, 8192x6144, electronic shutter only, photo interval 0.5/0.7/1/2s... (DJI spec via retailers).
+# medium_tele_3x and wide_1x values are NOT verified.
+cameras:
+  tele_7x:
+    equiv_focal_mm: 168
+    img_w_px: 8192
+    img_h_px: 6144
+    min_photo_interval_s: 2.0   # SUSTAINED interval. Spec lists 0.7 s; your 8 Sep plan assumed 2.0 s (unmeasured). Too low = dropped frames. Measure in Pilot 2 at 48MP.
+    shutter_s: 0.0005        # exposure used for motion-blur speed limit
+    mb_per_photo: 20
+  medium_tele_3x:
+    equiv_focal_mm: 70
+    img_w_px: 8192
+    img_h_px: 6144
+    min_photo_interval_s: 0.7
+    shutter_s: 0.0005
+    mb_per_photo: 20
+  wide_1x:
+    equiv_focal_mm: 24
+    img_w_px: 5280
+    img_h_px: 3956
+    min_photo_interval_s: 0.5
+    shutter_s: 0.0005
+    mb_per_photo: 10
+
+  # Matrice 350 RTK + Zenmuse P1 50mm: 35.9x24mm full frame, 45MP, 4.4um, mech. shutter 1/2000, min interval 0.7s (DJI spec).
+  # Footprint from real sensor width / focal length. 'flight_override' replaces values in `flight` for this camera.
+  p1_50mm:
+    sensor_w_mm: 35.9
+    focal_mm: 50
+    img_w_px: 8192
+    img_h_px: 5460
+    min_photo_interval_s: 0.7
+    shutter_s: 0.0005
+    mb_per_photo: 25
+    flight_override:       # M350 values: battery time with P1 is my ASSUMPTION (DJI 55 min is payload-free)
+      max_speed_ms: 15.0
+      transit_speed_ms: 15.0
+      battery_flight_min: 40.0
+
+# ---------------------------------------------------------------- aircraft / flight
+flight:
+  max_speed_ms: 15.0         # cap in mapping mode
+  transit_speed_ms: 12.0     # between legs / segments
+  min_speed_ms: null         # lowest speed the aircraft accepts (null = no floor)
+  max_blur_px: 0.5           # speed limited so motion blur <= this many pixels
+  stop_and_go: false         # true: hover + shoot at each waypoint (slower, sharper)
+  stop_and_go_overhead_s: 2.0  # per photo
+  turn_time_s: 6.0           # decel + yaw + accel at each line end
+  overhead_s: 120.0          # takeoff, climb, landing per mission
+  max_agl_m: 120.0           # flag scenarios exceeding this
+  min_agl_m: 5.0             # flag scenarios below this (obstacle clearance)
+  battery_flight_min: 42.0  # DJI max flight time for M4E
+  battery_usable_frac: 0.75  # reserve for RTH / safety
+  image_across_track: width  # width: image long side across the line; height: along
+
+# ---------------------------------------------------------------- path
+path:
+  angle_deg: null            # line azimuth (0 = East, CCW); null = auto, fewest lines
+  angle_step_deg: 5
+  edge_buffer_m: 0.0         # grow polygon so images cover beyond the edge
+
+# ---------------------------------------------------------------- output
+output:
+  export_waypoints: true     # gpkg of lines + photo points per scenario (in hydra run dir)
+  save_csv: true

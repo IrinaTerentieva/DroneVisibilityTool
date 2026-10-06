@@ -1,0 +1,39 @@
+# DJI mission builder for M4E tele 7x (or any camera in config.yaml).
+# Run build_mission.py from PyCharm. Reuses cameras / flight / path settings from config.yaml.
+defaults:
+  - config
+  - _self_
+
+mission:
+  area_index: 0              # which polygon of `areas` (in file order) to fly
+  camera: tele_7x
+  altitude_m: 30             # AGL, flat terrain: height relative to take-off point
+  front_overlap: 0.80        # only sets the photo interval distance (free in time)
+  side_overlap: 0.30
+  name: CSC_M4E_tele7x_30m
+  export_dir: /media/irina/SD_Card/good_mission   # also copy KMZ legs + boundary + scripts snapshot here (null = skip)
+  leg_min: 45                # minutes of wayline per KMZ (one file per battery); null = one file
+  min_speed_ms: null         # no floor: Pilot 2 accepted 0.71 m/s in your 8 Sep mission
+
+dji:
+  # Values copied from your working Sept 2026 Pilot 2 missions
+  # (/media/irina/Cold/CityOfCalgary_UrbanForestry/2026/mission_planning/build_m4e_whitepad_mission.py).
+  # reference_kmz: optional, copies droneInfo/payloadInfo from any Pilot 2 KMZ instead.
+  reference_kmz: null
+  drone_enum: 99             # Matrice 4E
+  drone_sub_enum: 0
+  payload_enum: 88           # M4E camera
+  payload_sub_enum: 0
+  payload_position: 0
+  image_format: zoom         # tele lens (also used as payloadLensIndex in takePhoto)
+  zoom_focal_length_mm: 168  # 7x tele, 35mm equivalent; null = skip zoom action
+  gimbal_pitch_deg: -90      # nadir
+  positioning_type: RTKBaseStation   # as in your Sept missions; use GPS without RTK
+  take_off_security_height_m: 40     # climb to this height first ('safely' mode)
+  rth_height_m: 50           # return-to-home height above take-off: must clear trees
+  finish_action: goHome      # goHome | noAction | autoLand | gotoFirstWaypoint
+  fly_to_wayline_mode: safely
+  rc_lost: {exit_on_rc_lost: executeLostAction, action: goBack}
+  transitional_speed_ms: 5
+  heading_mode: followWayline  # nose always points along the flight direction | fixed (constant heading, as in the 8 Sep flight)
+  photo_trigger: multipleDistance   # photos every `photo spacing` metres between line start and end
