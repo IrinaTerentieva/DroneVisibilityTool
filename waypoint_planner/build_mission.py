@@ -92,17 +92,18 @@ def main(cfg: DictConfig) -> None:
 
     if m.export_dir:   # copy results + a snapshot of the code that made them
         dst = Path(m.export_dir); dst.mkdir(parents=True, exist_ok=True)
+        anc = dst / "ancillary"; anc.mkdir(exist_ok=True)   # the KMZ(s) stay on top, everything else goes here
         for f in out_dir.iterdir():
             if f.is_file() and f.suffix in {".kmz", ".kml", ".gpkg", ".txt"}:
-                shutil.copy2(f, dst / f.name)
-        code = dst / "scripts"
+                shutil.copy2(f, (dst if f.suffix == ".kmz" else anc) / f.name)
+        code = anc / "scripts"
         for rel in ("build_mission.py", "run_flight_time.py", "README.md", "src", "config"):
             src_ = HERE / rel
             if src_.is_dir():
                 shutil.copytree(src_, code / rel, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
             else:
                 code.mkdir(exist_ok=True); shutil.copy2(src_, code / rel)
-        OmegaConf.save(cfg, dst / f"{m.name}_resolved_config.yaml")
+        OmegaConf.save(cfg, anc / f"{m.name}_resolved_config.yaml")
         log.info(f"Copied to {dst}")
 
     t = metrics["time_min"]
