@@ -7,6 +7,12 @@ Modern drone operations require a nuanced understanding of what the pilot can ac
 
 Drone Visibility Analysis Tools is designed to simulate and evaluate what’s visible from the pilot’s perspective. Use it for planning, compliance, or simply to gain spatial insight into how your environment affects visual connections to the sky.
 
+## Setting your paths
+
+Data paths are not stored in the repo. Copy `config/local.example/paths.yaml` to `config/local/paths.yaml`
+(git-ignored) and set your DSM, staging points and output paths there. Hydra merges it over `config/angle.yaml`;
+the scripts in `dev/` read the `dev:` section of the same file.
+
 ## Features
 
 ### Core Capabilities

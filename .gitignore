@@ -208,3 +208,7 @@ __marimo__/
 
 # waypoint_planner run outputs
 waypoint_planner/outputs/
+
+# local machine paths (never pushed)
+config/local/
+waypoint_planner/config/local/

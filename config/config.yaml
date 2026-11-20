@@ -1,7 +1,7 @@
-### /home/irina/DroneVisibilityTool/config.yaml
 
 defaults:
   - angle  # This loads config/angle.yaml
+  - optional local@_global_: paths  # real paths, git-ignored (config/local/paths.yaml)
   - _self_
 
 hydra:
