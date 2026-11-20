@@ -1,0 +1,24 @@
+# EXAMPLE: copy to config/local/paths.yaml and put your real paths there (that file is git-ignored). Merged over config/angle.yaml by Hydra.
+paths:
+  dsm_path: /path/to/DSM_may25.tif
+  staging_gpkg: /path/to/staging_day2.gpkg
+  output_gpkg: /path/to/staging_day2.gpkg
+angle:
+  paths:
+    dsm_path: /path/to/DSM_may25.tif
+    staging_gpkg: /path/to/staging_day2.gpkg
+    output_gpkg: /path/to/staging_day2.gpkg
+drone_angle:
+  paths:
+    dsm_path: /path/to/DSM_may25.tif
+    staging_gpkg: /path/to/staging_day2.gpkg
+    output_gpkg: /path/to/drone_angle_visibility.gpkg
+# used by the scripts in dev/
+dev:
+  dsm_path: /path/to/DSM_may25.tif
+  staging_gpkg: /path/to/staging_day2.gpkg
+  output_gpkg: /path/to/staging_day2.gpkg
+  real_output_folder: /path/to/visibility_day2min
+  real_final_output: /path/to/staging_day2min.gpkg
+  vis_output_folder: /path/to/visibility_day2
+  vis_final_output: /path/to/staging_day2.gpkg

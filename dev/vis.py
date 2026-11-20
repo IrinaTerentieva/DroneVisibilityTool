@@ -732,12 +732,13 @@ if __name__ == "__main__":
         mp.set_start_method('spawn', force=True)
 
         # Your file paths
-        dsm_path = "file:///media/irina/My Book/Petronas/DATA/FullData/DSM_may25.tif"
-        staging_gpkg = "file:///home/irina/Desktop/petronas_staging_day2.gpkg"
+        from _local_paths import P
+        dsm_path = "file://" + P["dsm_path"]
+        staging_gpkg = "file://" + P["staging_gpkg"]
 
         # Output paths
-        output_folder = "/media/irina/My Book/Petronas/DATA/visibility_petronas_day2"
-        final_output_path = "/media/irina/My Book/Petronas/DATA/staging_petronas_day2.gpkg"
+        output_folder = P["vis_output_folder"]
+        final_output_path = P["vis_final_output"]
 
         # Analysis parameters
         MOBILITY_BUFFER = 150.0

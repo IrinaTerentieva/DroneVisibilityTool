@@ -729,8 +729,9 @@ class DetailedMobilityVisibilityAnalyzer:
 # Main execution
 if __name__ == "__main__":
     # File paths - update these to your actual paths
-    dsm_path = "file:///media/irina/My Book/Petronas/DATA/FullData/DSM_may25.tif"
-    staging_gpkg = "file:///home/irina/Desktop/petronas_staging_day2.gpkg"
+    from _local_paths import P
+    dsm_path = "file://" + P["dsm_path"]
+    staging_gpkg = "file://" + P["staging_gpkg"]
 
     # Analysis parameters
     MOBILITY_BUFFER = 100.0  # 100m operator movement radius
