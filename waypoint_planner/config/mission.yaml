@@ -1,8 +1,8 @@
 # DJI mission builder for M4E tele 7x (or any camera in config.yaml).
 # Run build_mission.py from PyCharm. Reuses cameras / flight / path settings from config.yaml.
 defaults:
-  - config
   - _self_
+  - config   # loads config.yaml and then config/local/paths.yaml (real areas, mission name, export folder)
 
 mission:
   area_index: 0              # which polygon of `areas` (in file order) to fly
@@ -10,14 +10,14 @@ mission:
   altitude_m: 30             # AGL, flat terrain: height relative to take-off point
   front_overlap: 0.60        # sets the photo interval distance; >=70% makes the camera interval limit the speed
   side_overlap: 0.30
-  name: CSC_M4E_tele7x_30m
-  export_dir: /media/irina/SD_Card/good_mission   # also copy KMZ legs + boundary + scripts snapshot here (null = skip)
+  name: M4E_tele7x_30m
+  export_dir: null   # set in config/local/paths.yaml; also copy KMZ legs + boundary + scripts snapshot here (null = skip)
   leg_min: null              # minutes of wayline per KMZ; null = ONE mission (resume after battery swap in Pilot 2)
   min_speed_ms: null         # no floor: Pilot 2 accepted 0.71 m/s in your 8 Sep mission
 
 dji:
   # Values copied from your working Sept 2026 Pilot 2 missions
-  # (/media/irina/Cold/CityOfCalgary_UrbanForestry/2026/mission_planning/build_m4e_whitepad_mission.py).
+  # (from an earlier working mission script).
   # reference_kmz: optional, copies droneInfo/payloadInfo from any Pilot 2 KMZ instead.
   reference_kmz: null
   drone_enum: 99             # Matrice 4E

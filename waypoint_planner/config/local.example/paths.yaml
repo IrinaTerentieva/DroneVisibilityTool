@@ -1,0 +1,8 @@
+# EXAMPLE: copy to config/local/paths.yaml (git-ignored) and list your area files there.
+areas:
+  - path: /path/to/site_boundaries.kml
+    layer: null
+    name_field: null
+mission:
+  name: M4E_tele7x_30m
+  export_dir: /path/to/sd_card/mission   # null = skip

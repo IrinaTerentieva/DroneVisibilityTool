@@ -11,6 +11,11 @@ Model: footprint from 35mm-equiv focal length; line spacing = width*(1-side); ph
 speed = min(aircraft max, photo interval limit, motion-blur limit); lines at the angle giving fewest passes;
 time = legs + transits + turns + overhead. Flat terrain, constant AGL. Camera specs are assumptions — verify them.
 
+## Your areas and mission folder
+
+Site files, mission name and export folder are not stored in the repo. Copy `config/local.example/paths.yaml` to
+`config/local/paths.yaml` (git-ignored) and set them there; both scripts pick it up automatically.
+
 ## Mission builder (DJI Pilot 2 KMZ)
 
 Run `build_mission.py` in PyCharm; edit `config/mission.yaml` (camera, AGL, overlaps, `leg_min`, `heading_mode`, `export_dir`).

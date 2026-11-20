@@ -1,6 +1,10 @@
 # Flight-time estimator for DJI Matrice 4E (M4E) camera zoom levels.
 # Run run_flight_time.py from PyCharm (no CLI args needed). Every list below is swept (full grid).
 
+defaults:
+  - _self_
+  - optional local@_global_: paths   # real areas + mission name/export folder, git-ignored
+
 hydra:
   run:
     dir: outputs/${now:%d%b%Y}_${now:%H-%M-%S}
@@ -9,7 +13,7 @@ hydra:
 
 # ---------------------------------------------------------------- areas
 areas:
-  - path: /media/irina/Cold/CityOfCalgary_UrbanForestry/vector/CSC Site Map.kml
+  - path: /path/to/site_boundaries.kml   # real list in config/local/paths.yaml (git-ignored)
     layer: null          # null = first layer
     name_field: null     # attribute used as polygon name (null -> file stem + index)
 
